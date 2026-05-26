@@ -5,7 +5,10 @@
         <span class="{{ $product->badge_class ?? 'sale-tag' }}">{{ $product->badge }}</span>
         @endif
         <div class="button">
-            <a href="#" class="btn"><i class="lni lni-cart"></i> Add to Cart</a>
+            <button
+                wire:click="addToCart({{ $product->id }})"
+                wire:loading.attr="disabled"
+                class="btn"><i class="lni lni-cart"></i> Add to Cart</button>
         </div>
     </div>
     <div class="product-info">

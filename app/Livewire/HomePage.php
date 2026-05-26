@@ -8,6 +8,7 @@ use App\Models\Category;
 use App\Models\Product;
 use App\Models\Slider;
 use Livewire\Component;
+use App\Services\CartService;
 
 class HomePage extends Component
 {
@@ -29,6 +30,22 @@ class HomePage extends Component
         $this->trendingProducts = Product::where('is_trending', true)->get();
         $this->brands = Brand::orderBy('id')->get();
         $this->banners = Banner::orderBy('id')->get();
+    }
+
+    public function addToCart($productId, CartService $cartService)
+    {
+        $product = Product::findOrFail($productId);
+
+        $cartService->add([
+            'id' => $product->id,
+            'name' => $product->name,
+            'price' => $product->price,
+            'image' => $product->image,
+        ]);
+
+        $this->dispatch('cart-updated');
+
+        session()->flash('success', 'Product added to cart successfully');
     }
 
     public function getSearchResultsProperty()

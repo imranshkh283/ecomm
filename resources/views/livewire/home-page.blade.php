@@ -4,7 +4,7 @@
             <div class="container">
                 <div class="row align-items-center">
                     <div class="col-lg-4 col-md-4 col-12">
-                        <div class="top-left">
+                        <!-- <div class="top-left">
                             <ul class="menu-top-link">
                                 <li>
                                     <div class="select-position">
@@ -32,16 +32,16 @@
                                     </div>
                                 </li>
                             </ul>
-                        </div>
+                        </div> -->
                     </div>
                     <div class="col-lg-4 col-md-4 col-12">
-                        <div class="top-middle">
+                        <!-- <div class="top-middle">
                             <ul class="useful-links">
                                 <li><a href="#">Home</a></li>
                                 <li><a href="#about">About Us</a></li>
                                 <li><a href="#contact">Contact Us</a></li>
                             </ul>
-                        </div>
+                        </div> -->
                     </div>
                     <div class="col-lg-4 col-md-4 col-12">
                         <div class="top-end">
@@ -123,9 +123,9 @@
                                     </a>
                                 </div>
                                 <div class="cart-items">
-                                    <a href="javascript:void(0)" class="main-btn">
+                                    <a href="{{ route('cart') }}" class="main-btn">
                                         <i class="lni lni-cart"></i>
-                                        <span class="total-items">2</span>
+                                        <livewire:cart.cart-count />
                                     </a>
                                 </div>
                             </div>
