@@ -3,8 +3,9 @@
 namespace App\Livewire;
 
 use Livewire\Component;
-use App\Livewire\Traits\HasStoreData;
+use App\Models\Product;
 use App\Services\CartService;
+use App\Livewire\Traits\HasStoreData;
 
 class HomePage extends Component
 {

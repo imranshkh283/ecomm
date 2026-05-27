@@ -4,6 +4,7 @@ namespace App\Livewire\Partials;
 
 use Livewire\Component;
 use App\Models\Category;
+use App\Services\CartService;
 use Livewire\Attributes\On;
 
 class Header extends Component
