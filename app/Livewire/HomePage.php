@@ -2,34 +2,20 @@
 
 namespace App\Livewire;
 
-use App\Models\Banner;
-use App\Models\Brand;
-use App\Models\Category;
-use App\Models\Product;
-use App\Models\Slider;
 use Livewire\Component;
+use App\Livewire\Traits\HasStoreData;
 use App\Services\CartService;
 
 class HomePage extends Component
 {
+    use HasStoreData;
+
     public string $search = '';
     public string $newsletterEmail = '';
 
-    public $sliders;
-    public $categories;
-    public $featuredProducts;
-    public $trendingProducts;
-    public $brands;
-    public $banners;
-
     public function mount(): void
     {
-        $this->sliders = Slider::orderBy('id')->get();
-        $this->categories = Category::orderBy('id')->get();
-        $this->featuredProducts = Product::where('is_featured', true)->get();
-        $this->trendingProducts = Product::where('is_trending', true)->get();
-        $this->brands = Brand::orderBy('id')->get();
-        $this->banners = Banner::orderBy('id')->get();
+        $this->loadStoreData();
     }
 
     public function addToCart($productId, CartService $cartService)

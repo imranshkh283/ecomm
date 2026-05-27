@@ -52,19 +52,19 @@
                                 </div>
                             </div>
                             @if($search)
-                                <div class="search-results bg-white border p-3 mt-2">
-                                    <ul class="list-unstyled mb-0">
-                                        @forelse($searchResults as $product)
-                                            <li class="py-2">
-                                                <a href="#" class="text-dark">
-                                                    {{ $product->name }} <small class="text-muted">({{ $product->category }})</small>
-                                                </a>
-                                            </li>
-                                        @empty
-                                            <li class="text-muted">No products found.</li>
-                                        @endforelse
-                                    </ul>
-                                </div>
+                            <div class="search-results bg-white border p-3 mt-2">
+                                <ul class="list-unstyled mb-0">
+                                    @forelse($searchResults as $product)
+                                    <li class="py-2">
+                                        <a href="#" class="text-dark">
+                                            {{ $product->name }} <small class="text-muted">({{ $product->category }})</small>
+                                        </a>
+                                    </li>
+                                    @empty
+                                    <li class="text-muted">No products found.</li>
+                                    @endforelse
+                                </ul>
+                            </div>
                             @endif
                         </div>
                     </div>
@@ -105,16 +105,16 @@
                             <span class="cat-button"><i class="lni lni-menu"></i>All Categories</span>
                             <ul class="sub-category">
                                 @foreach($categories as $category)
-                                    <li>
-                                        <a href="{{ $category->link }}">{{ $category->name }} <i class="lni lni-chevron-right"></i></a>
-                                        @if($category->items)
-                                            <ul class="inner-sub-category">
-                                                @foreach(json_decode($category->items, true) as $item)
-                                                    <li><a href="{{ $category->link }}">{{ $item }}</a></li>
-                                                @endforeach
-                                            </ul>
-                                        @endif
-                                    </li>
+                                <li>
+                                    <a href="{{ $category->link }}">{{ $category->name }} <i class="lni lni-chevron-right"></i></a>
+                                    @if($category->items)
+                                    <ul class="inner-sub-category">
+                                        @foreach(json_decode($category->items, true) as $item)
+                                        <li><a href="{{ $category->link }}">{{ $item }}</a></li>
+                                        @endforeach
+                                    </ul>
+                                    @endif
+                                </li>
                                 @endforeach
                             </ul>
                         </div>
@@ -163,11 +163,11 @@
             </div>
 
             @if(session()->has('success'))
-                <div class="row mb-4">
-                    <div class="col-12">
-                        <div class="alert alert-success">{{ session('success') }}</div>
-                    </div>
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="alert alert-success">{{ session('success') }}</div>
                 </div>
+            </div>
             @endif
 
             <div class="cart-list-head">
@@ -193,40 +193,40 @@
                 </div>
 
                 @forelse($cartItems as $item)
-                    <div class="cart-single-list">
-                        <div class="row align-items-center">
-                            <div class="col-lg-1 col-md-1 col-12">
-                                <a href="#"><img src="{{ asset($item['image']) }}" alt="{{ $item['name'] }}"></a>
-                            </div>
-                            <div class="col-lg-4 col-md-3 col-12">
-                                <h5 class="product-name"><a href="#">{{ $item['name'] }}</a></h5>
-                            </div>
-                            <div class="col-lg-2 col-md-2 col-12">
-                                <div class="count-input d-flex align-items-center">
-                                    <button wire:click="decrease({{ $item['id'] }})" class="btn btn-sm btn-danger">-</button>
-                                    <span class="mx-2">{{ $item['qty'] }}</span>
-                                    <button wire:click="increase({{ $item['id'] }})" class="btn btn-sm btn-success">+</button>
-                                </div>
-                            </div>
-                            <div class="col-lg-2 col-md-2 col-12">
-                                <p>${{ number_format($item['price'], 2) }}</p>
-                            </div>
-                            <div class="col-lg-2 col-md-2 col-12">
-                                <p>${{ number_format($item['price'] * $item['qty'], 2) }}</p>
-                            </div>
-                            <div class="col-lg-1 col-md-2 col-12">
-                                <button wire:click="remove({{ $item['id'] }})" class="remove-item btn btn-link p-0" aria-label="Remove item">
-                                    <i class="lni lni-close"></i>
-                                </button>
+                <div class="cart-single-list">
+                    <div class="row align-items-center">
+                        <div class="col-lg-1 col-md-1 col-12">
+                            <a href="#"><img src="{{ asset($item['image']) }}" alt="{{ $item['name'] }}"></a>
+                        </div>
+                        <div class="col-lg-4 col-md-3 col-12">
+                            <h5 class="product-name"><a href="#">{{ $item['name'] }}</a></h5>
+                        </div>
+                        <div class="col-lg-2 col-md-2 col-12">
+                            <div class="count-input d-flex align-items-center">
+                                <button wire:click="decrease({{ $item['id'] }})" class="btn btn-sm btn-danger">-</button>
+                                <span class="mx-2">{{ $item['qty'] }}</span>
+                                <button wire:click="increase({{ $item['id'] }})" class="btn btn-sm btn-success">+</button>
                             </div>
                         </div>
+                        <div class="col-lg-2 col-md-2 col-12">
+                            <p>${{ number_format($item['price'], 2) }}</p>
+                        </div>
+                        <div class="col-lg-2 col-md-2 col-12">
+                            <p>${{ number_format($item['price'] * $item['qty'], 2) }}</p>
+                        </div>
+                        <div class="col-lg-1 col-md-2 col-12">
+                            <button wire:click="remove({{ $item['id'] }})" class="remove-item btn btn-link p-0" aria-label="Remove item">
+                                <i class="lni lni-close"></i>
+                            </button>
+                        </div>
                     </div>
+                </div>
                 @empty
-                    <div class="row">
-                        <div class="col-12">
-                            <div class="alert alert-warning">Your cart is empty.</div>
-                        </div>
+                <div class="row">
+                    <div class="col-12">
+                        <div class="alert alert-warning">Your cart is empty.</div>
                     </div>
+                </div>
                 @endforelse
             </div>
 
