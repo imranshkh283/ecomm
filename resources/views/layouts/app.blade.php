@@ -15,6 +15,8 @@
 </head>
 
 <body>
+    <livewire:partials.header />
+
     @yield('content')
 
     <script src="{{ asset('assets/js/bootstrap.min.js') }}"></script>
@@ -64,6 +66,7 @@
             },
         });
     </script>
+
     @livewireScripts
 </body>
 
