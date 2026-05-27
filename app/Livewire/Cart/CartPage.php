@@ -2,6 +2,11 @@
 
 namespace App\Livewire\Cart;
 
+use App\Models\Banner;
+use App\Models\Brand;
+use App\Models\Category;
+use App\Models\Product;
+use App\Models\Slider;
 use App\Services\CartService;
 use Livewire\Attributes\On;
 use Livewire\Component;
@@ -11,9 +16,33 @@ class CartPage extends Component
 
     public $cartItems = [];
     public $subtotal = 0;
+    public string $search = '';
+    public string $newsletterEmail = '';
+
+    public $sliders;
+    public $categories;
+    public $featuredProducts;
+    public $trendingProducts;
+    public $brands;
+    public $banners;
+
+    public function getSearchResultsProperty()
+    {
+        return Product::when($this->search, function ($query) {
+            return $query->where('name', 'like', "%{$this->search}%")
+                ->orWhere('category', 'like', "%{$this->search}%");
+        })->limit(6)->get();
+    }
 
     public function mount(CartService $cartService)
     {
+        $this->sliders = Slider::orderBy('id')->get();
+        $this->categories = Category::orderBy('id')->get();
+        $this->featuredProducts = Product::where('is_featured', true)->get();
+        $this->trendingProducts = Product::where('is_trending', true)->get();
+        $this->brands = Brand::orderBy('id')->get();
+        $this->banners = Banner::orderBy('id')->get();
+
         $this->loadCart($cartService);
     }
 
@@ -36,7 +65,7 @@ class CartPage extends Component
 
         $this->loadCart($cartService);
 
-        $this->dispatch('cart-updated');
+        $this->emit('cart-updated');
     }
 
     public function decrease($productId, CartService $cartService)
@@ -45,7 +74,7 @@ class CartPage extends Component
 
         $this->loadCart($cartService);
 
-        $this->dispatch('cart-updated');
+        $this->emit('cart-updated');
     }
 
     public function remove($productId, CartService $cartService)
@@ -54,7 +83,7 @@ class CartPage extends Component
 
         $this->loadCart($cartService);
 
-        $this->dispatch('cart-updated');
+        $this->emit('cart-updated');
     }
 
     public function render()

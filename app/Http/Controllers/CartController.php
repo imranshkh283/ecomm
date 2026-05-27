@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-class HomeController extends Controller
+class CartController extends Controller
 {
     public function index(): \Illuminate\Contracts\View\View
     {
-        return view('website.index');
+        return view('website.cart');
     }
 }
