@@ -6,7 +6,8 @@
                     <div class="slider-head">
                         <div class="hero-slider">
                             @foreach($sliders as $slide)
-                            <div class="single-slider" style="background-image: url({{ asset($slide->image) }});">
+                            <div class="single-slider"
+                                style="background-image: url('{{ asset('storage/banners/' . $slide->image) }}');">
                                 <div class="content">
                                     <h2>
                                         <span>{{ $slide->subtitle }}</span>
@@ -70,7 +71,7 @@
                             @endforeach
                         </ul>
                         <div class="images">
-                            <img src="{{ asset($category->image) }}" alt="{{ $category->name }}" />
+                            <img src="{{ asset('storage/featured-categories/' . $category->image) }}" alt="{{ $category->name }}" />
                         </div>
                     </div>
                 </div>

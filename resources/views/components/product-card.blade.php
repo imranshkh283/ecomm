@@ -1,6 +1,6 @@
 <div class="single-product">
     <div class="product-image">
-        <img src="{{ asset($product->image) }}" alt="{{ $product->name }}" />
+        <img src="{{ asset('storage/products/' . $product->image) }}" alt="{{ $product->name }}" />
         @if($product->badge)
         <span class="{{ $product->badge_class ?? 'sale-tag' }}">{{ $product->badge }}</span>
         @endif
