@@ -6,13 +6,13 @@
                     <div class="mega-category-menu">
                         <span class="cat-button"><i class="lni lni-menu"></i>All Categories</span>
                         <ul class="sub-category">
-                            @foreach($categories as $category)
+                            @foreach($menuItems as $menuItem)
                             <li>
-                                <a href="{{ $category->link }}">{{ $category->name }} <i class="lni lni-chevron-right"></i></a>
-                                @if($category->items)
+                                <a href="{{ $menuItem->href }}">{{ $menuItem->name }} @if($menuItem->children->isNotEmpty()) <i class="lni lni-chevron-right"></i>@endif</a>
+                                @if($menuItem->children->isNotEmpty())
                                 <ul class="inner-sub-category">
-                                    @foreach(json_decode($category->items, true) as $item)
-                                    <li><a href="{{ $category->link }}">{{ $item }}</a></li>
+                                    @foreach($menuItem->children as $child)
+                                    <li><a href="{{ $child->href }}">{{ $child->name }}</a></li>
                                     @endforeach
                                 </ul>
                                 @endif
@@ -28,7 +28,7 @@
                         </button>
                         <div class="collapse navbar-collapse sub-menu-bar" id="navbarSupportedContent">
                             <ul id="nav" class="navbar-nav ms-auto">
-                                <li class="nav-item"><a href="#" class="active">Home</a></li>
+                                <li class="nav-item"><a href="{{ route('home') }}" class="active">Home</a></li>
                                 <li class="nav-item"><a href="#" class="dd-menu">Pages</a></li>
                                 <li class="nav-item"><a href="#" class="dd-menu">Shop</a></li>
                                 <li class="nav-item"><a href="#" class="dd-menu">Blog</a></li>

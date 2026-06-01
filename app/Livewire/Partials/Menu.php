@@ -3,19 +3,21 @@
 namespace App\Livewire\Partials;
 
 use Livewire\Component;
-use App\Models\Category;
+use App\Models\Menu as MenuModel;
 use App\Services\CartService;
 use Livewire\Attributes\On;
 
 class Menu extends Component
 {
-    public $categories;
+    public $menuItems;
     public $cartCount = 0;
     public string $search = '';
 
-    public function mount(\App\Services\CartService $cartService)
+    public function mount(CartService $cartService)
     {
-        $this->categories = Category::all();
+        $this->menuItems = MenuModel::with('children')
+            ->topLevel()
+            ->get();
 
         $this->cartCount = count($cartService->getCart());
     }
@@ -25,6 +27,7 @@ class Menu extends Component
     {
         $this->cartCount = count($cartService->getCart());
     }
+
     public function render()
     {
         return view('livewire.partials.menu');
