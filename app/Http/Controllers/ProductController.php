@@ -14,12 +14,6 @@ class ProductController extends Controller
 
     public function show(string $slug): View
     {
-        $product = Product::where('slug', $slug)->firstOrFail();
-        $relatedProducts = Product::where('category', $product->category)
-            ->where('id', '!=', $product->id)
-            ->limit(4)
-            ->get();
-
-        return view('product.show', compact('product', 'relatedProducts'));
+        return view('product.show');
     }
 }

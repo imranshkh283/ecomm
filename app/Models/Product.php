@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Category;
 
 class Product extends Model
 {
@@ -24,4 +25,9 @@ class Product extends Model
         'is_trending',
         'is_new',
     ];
+
+    public function category()
+    {
+        return $this->belongsTo(Category::class);
+    }
 }
