@@ -2,57 +2,68 @@
 
 namespace App\Livewire;
 
+use App\Models\Product;
+use App\Services\CartService;
+use App\Livewire\Traits\HasStoreData;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\View\View;
+use Illuminate\Support\Str;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Livewire\Attributes\Computed;
-use App\Models\Product;
-use App\Models\Category;
-use App\Services\CartService;
-use App\Livewire\Traits\HasStoreData;
-use Illuminate\Support\Str;
 
 class ProductsPage extends Component
 {
     use HasStoreData, WithPagination;
+
+    protected string $paginationTheme = 'bootstrap';
+
+    protected array $queryString = [
+        'search' => ['except' => ''],
+        'sortBy' => ['except' => 'popularity'],
+        'selectedCategories' => ['except' => []],
+        'minPrice' => ['except' => 0],
+        'maxPrice' => ['except' => 10000],
+        'viewMode' => ['except' => 'list'],
+    ];
 
     public string $search = '';
     public string $sortBy = 'popularity';
     public array $selectedCategories = [];
     public float $minPrice = 0;
     public float $maxPrice = 10000;
-    public string $viewMode = 'list'; // 'grid' or 'list'
+    public string $viewMode = 'list';
 
     public function mount(): void
     {
         $this->loadStoreData();
     }
 
-    public function updatedSearch()
+    public function updating($name, $value): void
     {
+        if (in_array($name, ['search', 'sortBy', 'selectedCategories', 'minPrice', 'maxPrice'], true)) {
+            $this->resetPage();
+        }
+    }
+
+    public function setViewMode(string $mode): void
+    {
+        if (in_array($mode, ['grid', 'list'], true)) {
+            $this->viewMode = $mode;
+        }
+    }
+
+    public function clearFilters(): void
+    {
+        $this->search = '';
+        $this->sortBy = 'popularity';
+        $this->selectedCategories = [];
+        $this->minPrice = 0;
+        $this->maxPrice = 10000;
         $this->resetPage();
     }
 
-    public function updatedSortBy()
-    {
-        $this->resetPage();
-    }
-
-    public function updatedSelectedCategories()
-    {
-        $this->resetPage();
-    }
-
-    public function updatedMinPrice()
-    {
-        $this->resetPage();
-    }
-
-    public function updatedMaxPrice()
-    {
-        $this->resetPage();
-    }
-
-    public function addToCart($productId, CartService $cartService)
+    public function addToCart(int $productId, CartService $cartService): void
     {
         $product = Product::findOrFail($productId);
 
@@ -64,78 +75,82 @@ class ProductsPage extends Component
         ]);
 
         $this->dispatch('cart-updated');
-        session()->flash('success', 'Product added to cart successfully');
+        session()->flash('success', "{$product->name} added to cart successfully");
     }
 
-    #[Computed()]
-    public function products()
+    public function getProductsProperty()
     {
-        $query = Product::query();
-
-        // Search
-        if ($this->search) {
-            $query->where('name', 'like', "%{$this->search}%")
-                ->orWhere('category', 'like', "%{$this->search}%");
-        }
-
-        // Category filter - since category is stored as string in products table
-        if (!empty($this->selectedCategories)) {
-            $query->whereIn('category', $this->selectedCategories);
-        }
-
-        // Price range filter
-        $query->whereBetween('price', [$this->minPrice, $this->maxPrice]);
-
-        // Sorting
-        switch ($this->sortBy) {
-            case 'price-low-high':
-                $query->orderBy('price', 'asc');
-                break;
-            case 'price-high-low':
-                $query->orderBy('price', 'desc');
-                break;
-            case 'rating':
-                $query->orderBy('rating', 'desc');
-                break;
-            case 'newest':
-                $query->orderByDesc('created_at');
-                break;
-            case 'a-z':
-                $query->orderBy('name', 'asc');
-                break;
-            case 'z-a':
-                $query->orderBy('name', 'desc');
-                break;
-            default: // popularity
-                $query->orderByDesc('is_trending')
-                    ->orderByDesc('is_featured');
-        }
-
-        return $query->paginate(12);
+        return $this->buildProductsQuery()
+            ->paginate(12);
     }
 
-    #[Computed()]
-    public function categories()
+    protected function buildProductsQuery(): Builder
     {
-        // Get unique categories from products table
-        $categories = Product::select('category')
-            ->distinct()
+        return Product::query()
+            ->when($this->search, function (Builder $query) {
+                $query->where(function (Builder $query) {
+                    $query->where('name', 'like', "%{$this->search}%")
+                        ->orWhere('category', 'like', "%{$this->search}%");
+                });
+            })
+            ->when($this->selectedCategories, fn(Builder $query) => $query->whereIn('category', $this->selectedCategories))
+            ->whereBetween('price', [$this->minPrice, $this->maxPrice])
+            ->when($this->sortBy, function (Builder $query) {
+                switch ($this->sortBy) {
+                    case 'price-low-high':
+                        $query->orderBy('price', 'asc');
+                        break;
+                    case 'price-high-low':
+                        $query->orderBy('price', 'desc');
+                        break;
+                    case 'rating':
+                        $query->orderBy('rating', 'desc');
+                        break;
+                    case 'newest':
+                        $query->orderByDesc('created_at');
+                        break;
+                    case 'a-z':
+                        $query->orderBy('name', 'asc');
+                        break;
+                    case 'z-a':
+                        $query->orderBy('name', 'desc');
+                        break;
+                    default:
+                        $query->orderByDesc('is_trending')
+                            ->orderByDesc('is_featured');
+                }
+            });
+    }
+
+    public function getCategoriesProperty()
+    {
+        return Product::query()
+            ->selectRaw('category, COUNT(*) AS products_count')
+            ->groupBy('category')
             ->orderBy('category')
-            ->pluck('category')
-            ->map(function ($category) {
-                $count = Product::where('category', $category)->count();
+            ->get()
+            ->map(function ($row) {
                 return (object) [
-                    'name' => $category,
-                    'slug' => Str::slug($category),
-                    'products_count' => $count,
+                    'name' => $row->category,
+                    'slug' => Str::slug($row->category),
+                    'products_count' => $row->products_count,
                 ];
             });
-
-        return $categories;
     }
 
-    public function render()
+    public function getProductIdsProperty(): array
     {
-        return view('livewire.products-page');
+        return collect($this->products->items())
+            ->pluck('id')
+            ->toArray();
+    }
+
+    public function render(): View
+    {
+        return view('livewire.products-page', [
+            'products' => $this->products,
+            'categories' => $this->categories,
+            'productIds' => $this->productIds,
+        ]);
     }
 }
