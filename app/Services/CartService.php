@@ -2,13 +2,20 @@
 
 namespace App\Services;
 
+use App\Models\Cart;
+use App\Models\CartItem;
+use App\Models\Product;
+
 class CartService
 {
     protected string $sessionKey = 'cart';
 
-    public function getCart(): array
+    public function getCart()
     {
-        return session()->get($this->sessionKey, []);
+        // cartItem beolongsTo product
+
+        return Cart::where('session_id', session()->getId())
+            ->with('items', 'items.product')->get();
     }
 
     public function add(array $product): void
@@ -17,66 +24,112 @@ class CartService
 
         $productId = $product['id'];
 
+        $product = Product::findOrFail($productId);
+
         if (isset($cart[$productId])) {
-            $cart[$productId]['qty']++;
         } else {
-            $cart[$productId] = [
-                'id' => $product['id'],
-                'name' => $product['name'],
-                'price' => $product['price'],
-                'image' => $product['image'],
+            $cart->put($productId, [
+
+                'id' => $productId,
+                'name' => $product->name,
+                'price' => $product->price,
                 'qty' => 1,
-            ];
+            ]);
+        }
+
+        $cart = Cart::create([
+            'session_id' => session()->getId(),
+            'created_at' => now(),
+        ]);
+
+        $cartItem = CartItem::create([
+            'cart_id' => $cart->id,
+            'product_id' => $product['id'],
+            'quantity' => 1,
+            'price' => $product['price'],
+        ]);
+
+        session()->put($this->sessionKey, $cart);
+    }
+
+    public function remove(int $cartId): void
+    {
+        $cart = Cart::firstOrCreate([
+            'session_id' => session()->getId(),
+            'id' => $cartId,
+        ]);
+
+        $item = $cart->items()
+            ->where('cart_id', $cartId)
+            ->first();
+
+        if ($item) {
+            $cart->delete();
+            $item->delete();
         }
 
         session()->put($this->sessionKey, $cart);
     }
 
-    public function remove(int $productId): void
+    public function increaseQty(int $cartId): void
     {
-        $cart = $this->getCart();
+        $cart = Cart::firstOrCreate([
+            'session_id' => session()->getId(),
+            'id' => $cartId,
+        ]);
 
-        if (isset($cart[$productId])) {
-            unset($cart[$productId]);
+        $item = $cart->items()
+            ->where('cart_id', $cartId)
+            ->first();
+
+        if ($item) {
+            $item->increment('quantity');
+        } else {
+            $item = CartItem::create([
+                'cart_id' => $cart->id,
+                'product_id' => $cartId,
+                'quantity' => 1,
+                'price' => Product::findOrFail($cartId)->price,
+            ]);
         }
 
         session()->put($this->sessionKey, $cart);
     }
 
-    public function increaseQty(int $productId): void
+    public function decreaseQty(int $cartId): void
     {
-        $cart = $this->getCart();
+        $cart = Cart::firstOrCreate([
+            'session_id' => session()->getId(),
+            'id' => $cartId,
+        ]);
 
-        if (isset($cart[$productId])) {
-            $cart[$productId]['qty']++;
+        $item = $cart->items()
+            ->where('cart_id', $cartId)
+            ->first();
+
+        if (!$item) {
+            return;
         }
 
-        session()->put($this->sessionKey, $cart);
-    }
-
-    public function decreaseQty(int $productId): void
-    {
-        $cart = $this->getCart();
-
-        if (isset($cart[$productId])) {
-            $cart[$productId]['qty']--;
-
-            if ($cart[$productId]['qty'] <= 0) {
-                unset($cart[$productId]);
-            }
+        if ($item->quantity > 1) {
+            $item->decrement('quantity');
+        } else {
+            $item->delete();
         }
 
         session()->put($this->sessionKey, $cart);
     }
     public function totalItems(): int
     {
-        return collect($this->getCart())->sum('qty');
+        return CartItem::whereHas('cart', function ($q) {
+            $q->where('session_id', session()->getId());
+        })->sum('quantity');
     }
 
     public function subtotal(): float
     {
         return collect($this->getCart())
-            ->sum(fn($item) => $item['price'] * $item['qty']);
+            ->sum(fn($item) => $item->price * $item->quantity);
     }
 
     public function clear(): void

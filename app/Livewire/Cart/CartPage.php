@@ -44,31 +44,31 @@ class CartPage extends Component
         $this->subtotal = $cartService->subtotal();
     }
 
-    public function increase($productId, CartService $cartService)
+    public function increase($cartId, CartService $cartService)
     {
-        $cartService->increaseQty($productId);
+        $cartService->increaseQty($cartId);
 
         $this->loadCart($cartService);
 
-        $this->emit('cart-updated');
+        $this->dispatch('cart-updated');
     }
 
-    public function decrease($productId, CartService $cartService)
+    public function decrease($cartId, CartService $cartService)
     {
-        $cartService->decreaseQty($productId);
+        $cartService->decreaseQty($cartId);
 
         $this->loadCart($cartService);
 
-        $this->emit('cart-updated');
+        $this->dispatch('cart-updated');
     }
 
-    public function remove($productId, CartService $cartService)
+    public function remove($cartId, CartService $cartService)
     {
-        $cartService->remove($productId);
+        $cartService->remove($cartId);
 
         $this->loadCart($cartService);
 
-        $this->emit('cart-updated');
+        $this->dispatch('cart-updated');
     }
 
     public function render()
