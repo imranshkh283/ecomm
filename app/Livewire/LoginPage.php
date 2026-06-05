@@ -3,6 +3,7 @@
 namespace App\Livewire;
 
 use Livewire\Component;
+use Illuminate\Support\Facades\Auth;
 use App\Livewire\Traits\HasStoreData;
 use App\Services\CartService;
 
@@ -12,6 +13,15 @@ class LoginPage extends Component
 
     public string $search = '';
     public string $newsletterEmail = '';
+
+    public $email = '';
+    public $password = '';
+    public $remember = false;
+
+    protected $rules = [
+        'email' => 'required|email',
+        'password' => 'required',
+    ];
 
     public function mount(): void
     {
@@ -50,6 +60,34 @@ class LoginPage extends Component
 
         session()->flash('newsletterMessage', 'Thanks for subscribing!');
         $this->newsletterEmail = '';
+    }
+
+    public function login()
+    {
+        $this->validate();
+
+        if (! Auth::guard('customer')->attempt([
+            'email' => $this->email,
+            'password' => $this->password,
+        ], $this->remember)) {
+
+            $this->addError('email', 'Invalid credentials.');
+            return;
+        }
+
+        session()->regenerate();
+
+        return redirect()->route('home');
+    }
+
+    public function logout()
+    {
+        Auth::guard('customer')->logout();
+
+        request()->session()->invalidate();
+        request()->session()->regenerateToken();
+
+        return redirect()->route('/');
     }
 
     public function render()
