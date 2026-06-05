@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Cart;
 use App\Models\CartItem;
 use App\Models\Product;
+use Illuminate\Support\Facades\Auth;
 
 class CartService
 {
@@ -12,44 +13,49 @@ class CartService
 
     public function getCart()
     {
-        // cartItem beolongsTo product
-
-        return Cart::where('session_id', session()->getId())
-            ->with('items', 'items.product')->get();
+        return Cart::with('items.product')
+            ->when(auth()->check(), function ($q) {
+                $q->where('user_id', auth()->id());
+            }, function ($q) {
+                $q->where('session_id', session()->getId())
+                    ->whereNull('user_id');
+            })
+            ->first();
     }
 
     public function add(array $product): void
     {
-        $cart = $this->getCart();
-
         $productId = $product['id'];
 
-        $product = Product::findOrFail($productId);
+        $productModel = Product::findOrFail($productId);
 
-        if (isset($cart[$productId])) {
+        /**
+         * STEP 1: Get OR create cart (NEVER duplicate)
+         */
+        $cart = Cart::firstOrCreate([
+            'user_id' => $product['user_id'] ?? null,
+            'session_id' => $product['user_id'] ? null : $product['session_id'],
+        ]);
+
+        /**
+         * STEP 2: Check if item already exists
+         */
+        $cartItem = $cart->items()
+            ->where('product_id', $productId)
+            ->first();
+
+        /**
+         * STEP 3: Update or create item
+         */
+        if ($cartItem) {
+            $cartItem->increment('quantity');
         } else {
-            $cart->put($productId, [
-
-                'id' => $productId,
-                'name' => $product->name,
-                'price' => $product->price,
-                'qty' => 1,
+            $cart->items()->create([
+                'product_id' => $productId,
+                'quantity' => 1,
+                'price' => $productModel->price,
             ]);
         }
-
-        $cart = Cart::create([
-            'session_id' => session()->getId(),
-            'created_at' => now(),
-        ]);
-
-        $cartItem = CartItem::create([
-            'cart_id' => $cart->id,
-            'product_id' => $product['id'],
-            'quantity' => 1,
-            'price' => $product['price'],
-        ]);
-
-        session()->put($this->sessionKey, $cart);
     }
 
     public function remove(int $cartId): void

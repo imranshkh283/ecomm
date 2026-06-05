@@ -6,6 +6,8 @@ use Livewire\Component;
 use Illuminate\Support\Facades\Auth;
 use App\Livewire\Traits\HasStoreData;
 use App\Services\CartService;
+use App\Services\CartMergeService;
+
 
 class LoginPage extends Component
 {
@@ -64,6 +66,11 @@ class LoginPage extends Component
 
     public function login()
     {
+
+        $sessionId = session()->getId();
+
+        $mergeCartService = resolve(CartMergeService::class);
+
         $this->validate();
 
         if (! Auth::guard('customer')->attempt([
@@ -75,7 +82,13 @@ class LoginPage extends Component
             return;
         }
 
+        $user = Auth::guard('customer')->user();
+
+        $mergeCartService->merge($sessionId, $user);
+
         session()->regenerate();
+
+        $this->dispatch('login-success');
 
         return redirect()->route('home');
     }
@@ -84,10 +97,10 @@ class LoginPage extends Component
     {
         Auth::guard('customer')->logout();
 
-        request()->session()->invalidate();
-        request()->session()->regenerateToken();
+        // request()->session()->invalidate();
+        // request()->session()->regenerateToken();
 
-        return redirect()->route('/');
+        return redirect()->route('home');
     }
 
     public function render()

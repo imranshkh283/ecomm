@@ -19,13 +19,21 @@ class Menu extends Component
             ->topLevel()
             ->get();
 
-        $this->cartCount = count($cartService->getCart());
+        $cart = $cartService->getCart();
+
+        $this->cartCount = $cart
+            ? $cart->items->count()
+            : 0;
     }
 
     #[On('cart-updated')]
     public function refreshCart(CartService $cartService)
     {
-        $this->cartCount = count($cartService->getCart());
+        $cart = $cartService->getCart();
+
+        $this->cartCount = $cart
+            ? $cart->items->count()
+            : 0;
     }
 
     public function render()

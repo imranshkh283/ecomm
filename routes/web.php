@@ -15,3 +15,4 @@ Route::get('/product/{slug}', [ProductController::class, 'show'])->name('product
 Route::get('/cart', [CartController::class, 'index'])->name('cart');
 Route::get('/register', [RegisterController::class, 'index'])->name('register');
 Route::get('/login', [LoginController::class, 'index'])->name('login');
+Route::get('/logout', [App\Livewire\LoginPage::class, 'logout'])->name('logout');

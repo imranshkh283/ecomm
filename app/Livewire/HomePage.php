@@ -6,6 +6,7 @@ use Livewire\Component;
 use App\Models\Product;
 use App\Services\CartService;
 use App\Livewire\Traits\HasStoreData;
+use Illuminate\Support\Facades\Auth;
 
 class HomePage extends Component
 {
@@ -19,6 +20,11 @@ class HomePage extends Component
         $this->loadStoreData();
     }
 
+    public function getUserProperty()
+    {
+        return Auth::guard('customer')->user();
+    }
+
     public function addToCart($productId, CartService $cartService)
     {
         $product = Product::findOrFail($productId);
@@ -27,7 +33,8 @@ class HomePage extends Component
             'id' => $product->id,
             'name' => $product->name,
             'price' => $product->price,
-            'image' => $product->image,
+            'user_id' => $this->user?->id ?? null,
+            'session_id' => session()->getId(),
         ]);
 
         $this->dispatch('cart-updated');

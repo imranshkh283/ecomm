@@ -13,11 +13,19 @@
                         <div class="top-end">
                             <div class="user">
                                 <i class="lni lni-user"></i>
-                                Hello
+                                @if($this->user)
+                                Hello {{ $this->user->first_name }}
+                                @else
+                                Hello Guest
+                                @endif
                             </div>
                             <ul class="user-login">
+                                @if($this->user)
+                                <li><a href="{{ route('logout') }}">Sign Out</a></li>
+                                @else
                                 <li><a href="{{ route('login') }}">Sign In</a></li>
                                 <li><a href="{{ route('register') }}">Register</a></li>
+                                @endif
                             </ul>
                         </div>
                     </div>
