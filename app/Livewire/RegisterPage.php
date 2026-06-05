@@ -3,8 +3,10 @@
 namespace App\Livewire;
 
 use Livewire\Component;
+use Illuminate\Support\Facades\Hash;
 use App\Livewire\Traits\HasStoreData;
 use App\Services\CartService;
+use App\Models\Customer;
 
 class RegisterPage extends Component
 {
@@ -12,6 +14,13 @@ class RegisterPage extends Component
 
     public string $search = '';
     public string $newsletterEmail = '';
+
+    public $first_name;
+    public $last_name;
+    public $email;
+    public $phone;
+    public $password;
+    public $password_confirmation;
 
     public function mount(): void
     {
@@ -50,6 +59,23 @@ class RegisterPage extends Component
 
         session()->flash('newsletterMessage', 'Thanks for subscribing!');
         $this->newsletterEmail = '';
+    }
+
+    public function register()
+    {
+        $validated = $this->validate([
+            'first_name' => ['required', 'string', 'max:255'],
+            'last_name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'email', 'unique:customers,email'],
+            'phone' => ['required', 'string', 'max:20'],
+            'password' => ['required', 'min:5', 'confirmed'],
+        ]);
+
+        Customer::create(['first_name' => $validated['first_name'], 'last_name' => $validated['last_name'], 'email' => $validated['email'], 'phone' => $validated['phone'], 'password' => Hash::make($validated['password']),]);
+
+        session()->flash('success', 'Registration successful.');
+
+        return redirect()->route('login');
     }
 
     public function render()
