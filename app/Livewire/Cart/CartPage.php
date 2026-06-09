@@ -6,6 +6,7 @@ use App\Livewire\Traits\HasStoreData;
 use App\Services\CartService;
 use Livewire\Attributes\On;
 use Livewire\Component;
+use Illuminate\Support\Facades\Auth;
 
 class CartPage extends Component
 {
@@ -44,9 +45,9 @@ class CartPage extends Component
         $this->subtotal = $cartService->subtotal();
     }
 
-    public function increase($cartId, CartService $cartService)
+    public function increase($product_id, CartService $cartService)
     {
-        $cartService->increaseQty($cartId);
+        $cartService->increaseQty($product_id);
 
         $this->loadCart($cartService);
 

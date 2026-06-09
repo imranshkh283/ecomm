@@ -39,7 +39,7 @@
                         </div>
                     </div>
                 </div>
-                @if($cartItems->isEmpty() || $cartItems->sum(fn($cart) => $cart->items->count()) === 0)
+                @if(!$cartItems || $cartItems == null)
 
                 <div class="text-center py-5">
                     <h4 class="mb-2">Your cart is empty</h4>
@@ -50,12 +50,11 @@
                 </div>
 
                 @else
-
-                @foreach($cartItems as $item)
-                @foreach($item->items as $cartItem)
+                @foreach($cartItems?->items ?? [] as $cartItem)
 
                 <div class="cart-single-list">
                     <div class="row align-items-center">
+
                         <div class="col-lg-1 col-md-1 col-12">
                             <a href="#">
                                 <img src="{{ asset('storage/products/' . $cartItem->product->image) }}"
@@ -91,15 +90,14 @@
 
                         <div class="col-lg-1 col-md-2 col-12">
                             <button wire:click="remove({{ $cartItem->product_id }})"
-                                class="remove-item btn btn-link p-0"
-                                aria-label="Remove item">
+                                class="remove-item btn btn-link p-0">
                                 <i class="lni lni-close"></i>
                             </button>
                         </div>
+
                     </div>
                 </div>
 
-                @endforeach
                 @endforeach
 
                 @endif

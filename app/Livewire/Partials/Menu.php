@@ -21,9 +21,7 @@ class Menu extends Component
 
         $cart = $cartService->getCart();
 
-        $this->cartCount = $cart
-            ? $cart->items->count()
-            : 0;
+        $this->cartCount = optional($cart?->items)->count() ?? 0;
     }
 
     #[On('cart-updated')]
