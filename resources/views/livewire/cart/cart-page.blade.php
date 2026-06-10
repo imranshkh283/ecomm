@@ -129,7 +129,7 @@
                                         <li class="last">Total<span>${{ number_format($subtotal, 2) }}</span></li>
                                     </ul>
                                     <div class="button">
-                                        <a href="#" class="btn">Checkout</a>
+                                        <button wire:click="checkout" class="btn">Checkout</button>
                                         <a href="{{ route('home') }}" class="btn btn-alt">Continue shopping</a>
                                     </div>
                                 </div>

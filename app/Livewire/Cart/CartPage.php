@@ -6,7 +6,6 @@ use App\Livewire\Traits\HasStoreData;
 use App\Services\CartService;
 use Livewire\Attributes\On;
 use Livewire\Component;
-use Illuminate\Support\Facades\Auth;
 
 class CartPage extends Component
 {
@@ -70,6 +69,18 @@ class CartPage extends Component
         $this->loadCart($cartService);
 
         $this->dispatch('cart-updated');
+    }
+
+    public function checkout()
+    {
+        // $cart = app(CartService::class)->getCart();
+
+        // if (!$cart || $cart->items->isEmpty()) {
+        //     session()->flash('error', 'Your cart is empty.');
+        //     return;
+        // }
+
+        return $this->redirectRoute('checkout');
     }
 
     public function render()
