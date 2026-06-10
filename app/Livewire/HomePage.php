@@ -6,11 +6,14 @@ use Livewire\Component;
 use App\Models\Product;
 use App\Services\CartService;
 use App\Livewire\Traits\HasStoreData;
-use Illuminate\Support\Facades\Auth;
+use App\Livewire\Traits\HasCartActions;
 
 class HomePage extends Component
 {
     use HasStoreData;
+    use HasCartActions {
+        addToCart as protected traitAddToCart;
+    }
 
     public string $search = '';
     public string $newsletterEmail = '';
@@ -29,13 +32,12 @@ class HomePage extends Component
     {
         $product = Product::findOrFail($productId);
 
-        $cartService->add([
-            'id' => $product->id,
-            'name' => $product->name,
-            'price' => $product->price,
-            'user_id' => $this->user?->id ?? null,
-            'session_id' => session()->getId(),
-        ]);
+        if (!$product->id) {
+            session()->flash('error', 'Product not found');
+            return;
+        }
+
+        $this->traitAddToCart($product, $cartService);
 
         $this->dispatch('cart-updated');
 

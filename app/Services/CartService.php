@@ -3,9 +3,9 @@
 namespace App\Services;
 
 use App\Models\Cart;
-use App\Models\CartItem;
 use App\Models\Product;
 use Illuminate\Support\Facades\Auth;
+
 
 class CartService
 {
@@ -28,15 +28,14 @@ class CartService
     public function add(array $product): void
     {
         $productId = $product['id'];
-
         $productModel = Product::findOrFail($productId);
 
         /**
          * STEP 1: Get OR create cart (NEVER duplicate)
          */
         $cart = Cart::firstOrCreate([
-            'user_id' => $product['user_id'] ?? null,
-            'session_id' => $product['user_id'] ? null : $product['session_id'],
+            'user_id' => Auth::guard('customer')->user()->id,
+            'session_id' => !Auth::guard('customer')->user() ? session()->getId() : null,
         ]);
 
         /**

@@ -23,6 +23,8 @@
     <script src="{{ asset('assets/js/tiny-slider.js') }}"></script>
     <script src="{{ asset('assets/js/glightbox.min.js') }}"></script>
     <script src="{{ asset('assets/js/main.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <script type="text/javascript">
         //========= Hero Slider
         tns({
@@ -64,6 +66,19 @@
                     items: 6,
                 },
             },
+        });
+
+        document.addEventListener('livewire:init', () => {
+            Livewire.on('show-alert', (event) => {
+                Swal.fire({
+                    toast: true,
+                    position: 'top-end',
+                    icon: event[0].type,
+                    title: event[0].message,
+                    showConfirmButton: false,
+                    timer: 3000
+                });
+            });
         });
     </script>
 
