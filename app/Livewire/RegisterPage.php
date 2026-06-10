@@ -27,22 +27,6 @@ class RegisterPage extends Component
         $this->loadStoreData();
     }
 
-    public function addToCart($productId, CartService $cartService)
-    {
-        $product = Product::findOrFail($productId);
-
-        $cartService->add([
-            'id' => $product->id,
-            'name' => $product->name,
-            'price' => $product->price,
-            'image' => $product->image,
-        ]);
-
-        $this->dispatch('cart-updated');
-
-        session()->flash('success', 'Product added to cart successfully');
-    }
-
     public function getSearchResultsProperty()
     {
         return Product::when($this->search, function ($query) {

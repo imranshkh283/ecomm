@@ -23,11 +23,6 @@ class HomePage extends Component
         $this->loadStoreData();
     }
 
-    public function getUserProperty()
-    {
-        return Auth::guard('customer')->user();
-    }
-
     public function addToCart($productId, CartService $cartService)
     {
         $product = Product::findOrFail($productId);

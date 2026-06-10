@@ -10,11 +10,14 @@ use Illuminate\View\View;
 use Illuminate\Support\Str;
 use Livewire\Component;
 use Livewire\WithPagination;
-use Livewire\Attributes\Computed;
+use App\Livewire\Traits\HasCartActions;
 
 class ProductsPage extends Component
 {
     use HasStoreData, WithPagination;
+    use HasCartActions {
+        addToCart as protected traitAddToCart;
+    }
 
     protected string $paginationTheme = 'bootstrap';
 
@@ -61,21 +64,6 @@ class ProductsPage extends Component
         $this->minPrice = 0;
         $this->maxPrice = 10000;
         $this->resetPage();
-    }
-
-    public function addToCart(int $productId, CartService $cartService): void
-    {
-        $product = Product::findOrFail($productId);
-
-        $cartService->add([
-            'id' => $product->id,
-            'name' => $product->name,
-            'price' => $product->price,
-            'image' => $product->image,
-        ]);
-
-        $this->dispatch('cart-updated');
-        session()->flash('success', "{$product->name} added to cart successfully");
     }
 
     public function getProductsProperty()

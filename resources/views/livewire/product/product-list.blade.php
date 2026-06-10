@@ -4,10 +4,11 @@
         <div class="row align-items-center">
             <div class="col-lg-4 col-md-4 col-12">
                 <div class="product-image">
-                    <img src="{{ $product->image }}" alt="{{ $product->name }}">
+                    <img src="{{ asset('storage/products/' . $product->image) }}"
+                        alt="{{ $product->name }}">
                     <span class="sale-tag">-25%</span>
                     <div class="button">
-                        <button wire:click="$emitUp('addToCart', {{ $product->id }})" class="btn">
+                        <button wire:click="addToCart({{ $product->id }})" wire:loading.attr="disabled" class="btn">
                             <i class="lni lni-cart"></i> Add to Cart
                         </button>
                     </div>

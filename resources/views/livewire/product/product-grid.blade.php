@@ -4,9 +4,9 @@
         <div class="col-lg-4 col-md-6 col-12 mb-4">
             <div class="single-product">
                 <div class="product-image">
-                    <img src="{{ $product->image }}" alt="{{ $product->name }}">
+                    <img src="{{ asset('storage/products/' . $product->image) }}" alt="{{ $product->name }}">
                     <div class="button">
-                        <button wire:click="$emitUp('addToCart', {{ $product->id }})" class="btn">
+                        <button wire:click="addToCart({{ $product->id }})" wire:loading.attr="disabled" class="btn">
                             <i class="lni lni-cart"></i> Add to Cart
                         </button>
                     </div>
