@@ -28,8 +28,8 @@
                         </button>
                         <div class="collapse navbar-collapse sub-menu-bar" id="navbarSupportedContent">
                             <ul id="nav" class="navbar-nav ms-auto">
-                                <li class="nav-item"><a href="{{ route('home') }}" class="active">Home</a></li>
-                                <li class="nav-item"><a href="{{ route('products.index') }}">Shop</a></li>
+                                <li class="nav-item"><a href="{{ route('home') }}" class=" {{ Route::is('home') ? 'active' : '' }}">Home</a></li>
+                                <li class="nav-item"><a href="{{ route('products.index') }}" class=" {{ Route::is('products.index') ? 'active' : '' }}">Shop</a></li>
                                 <li class="nav-item"><a href="#" class="dd-menu">Pages</a></li>
                                 <li class="nav-item"><a href="#" class="dd-menu">Blog</a></li>
                                 <li class="nav-item"><a href="#contact">Contact Us</a></li>
